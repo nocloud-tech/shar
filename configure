@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+dirname=$(dirname "${BASH_SOURCE[0]}")
+dirname=$(cd "$dirname" && pwd)
+
+CC="${CC:-gcc}"
+CFLAGS="${CFLAGS:--Werror -Wall -Wextra -g}"
+
+{
+cat << EOF
+cc = ${CC}
+cflags = ${CFLAGS}
+
+rule link
+    command = \$cc \$cflags -o \$out \$in
+
+rule html
+    command = asciidoctor --backend=html5 \$in
+
+build shtar: link shtar.c
+build docs/index.html: html docs/index.adoc
+EOF
+} > "$dirname"/build.ninja
+

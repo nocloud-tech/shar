@@ -1,0 +1,201 @@
+= shtar
+Michael Ainsworth
+v0.1, 2022-11-12
+:toc: left
+:url: 
+
+`shtar` is "the shell archiver", an archive utility similar to `tar`.
+
+== Compared to TAR
+
+=== TAR Archives
+
+The venerable `tar` ("tape archiver") utility creates an archive. An archive is
+a single file that acts as a container for one or more other files and directories.
+
+Imagine you keep your tasks in a series of text files in a `tasks` directory.
+
+.Show original tasks
+[source,sh]
+----
+head tasks/{1,2}.txt
+----
+
+.Original tasks
+----
+==> tasks/1.txt <==
+Clean the kitchen.
+
+==> tasks/2.txt <==
+Go grocery shopping.
+
+- Bread
+- Milk
+- Pizza
+- Fruit
+- Pizza
+- Pizza
+----
+
+You can combine the `tasks` directory and all the text files it contains into a
+file called `tasks.tar` with the following command.
+
+.Creating the archive and listing the archive file details
+[source,sh]
+----
+tar --create --file tasks.tar tasks
+ls -lh tasks.tar
+----
+ 
+.The archive file details
+----
+-rw-rw-r-- 1 user user 10240 Nov 12 21:56 tasks.tar
+----
+
+You can then re-create these files and directories from the archive.
+
+.Extract the archive to a temporary directory and show the contents
+[source,sh]
+----
+d=$(mktemp -d)
+cp tasks.tar "$d"
+cd "$d"
+tar --extract --file tasks.tar 
+head -n 10 tasks/*
+----
+
+.The extracted files are identical to the original files
+----
+==> tasks/1.txt <==
+Clean the kitchen.
+
+==> tasks/2.txt <==
+Go grocery shopping.
+
+- Bread
+- Milk
+- Pizza
+- Fruit
+- Pizza
+- Pizza
+----
+
+`tar` is useful. It is well documented, broadly used, supports compression and
+has a long history. It will likely be used for a long time to come. However,
+it has some disadvantages.
+
+- Whilst it installed on most UNIX-like systems, it is not present on all of them.
+- Versions of it on different platforms might support different command line arguments.
+- Versions of it may have different levels of support for the variations in file format.
+
+=== SHTAR Archives
+
+`shtar` does not replace `tar` - not by a long shot. It does, however, serve a
+similar purpose, in that it creates a single archive file that contains other
+files and directories.
+
+However, `shtar` is different. Instead of creating an archive file that can be
+extracted using another invocation of `shtar`, it instead creates a
+POSIX-compatible shell script that, when executed, will _extract itself_. 
+
+This has several benefits:
+
+- POSIX-compatible shells are installed on the vast majority of UNIX-like
+  systems.
+- There is less variation in the POSIX shell primitives used by `shtar` to
+  recreate file and directories.
+- The file format can evolve over time, as long as `sh` can execute the
+  commands. E.g., if we want to make the archive smaller, this can be done.
+
+== FAQ
+
+*What do the shell scripts look like?*
+
+Let's use the `tasks/1.txt` file above.
+
+----
+Clean the kitchen.
+----
+
+You can create a restoration script using the following command:
+
+.Create a shtar archive
+[source,sh]
+----
+shtar < tasks/1.txt
+----
+
+The output (written to standard out by default) will be as follows.
+
+.The content of the shtar archive
+[source,sh]
+----
+(
+printf "\103"
+printf "\154"
+printf "\145"
+printf "\141"
+printf "\156"
+printf "\040"
+printf "\164"
+printf "\150"
+printf "\145"
+printf "\040"
+printf "\153"
+printf "\151"
+printf "\164"
+printf "\143"
+printf "\150"
+printf "\145"
+printf "\156"
+printf "\056"
+printf "\012"
+)
+----
+
+*Wouldn't the resulting archive be bigger than the original input?*
+
+Yes. Size and speed are not goals of the project. Rather, the goal is a high
+level of compatibility with as many systems as possible. And the one piece of
+software that is installed on most UNIX-like systems is a POSIX-compatible
+shell.
+
+*Why did you work on this project?*
+
+Teaser: `shtar` exists in order that it can be used by other programs that rely
+heavily on compatible shells.
+
+== Building
+
+Building `shtar` from source requires the following.
+
+- link:https://ninja-build.org/[Ninja Build]
+- link:https://asciidoc.org/[Asciidoc]
+
+Once installed, perform the following.
+
+.Configure and "make" (with ninja)
+[source,sh]
+----
+./configure
+ninja
+----
+
+Note that at present, there is no `make install` step.
+
+== Roadmap
+
+The following is a list of items that should be completed.
+
+*Add execute permissions if the archive is not written to standard output.*
+
+*Ensure created files have the same r/w/x permissions as the original.*
+
+*Ensure created directories have the same r/w/x permissions as the original.*
+
+*Stop using `DIR*` for type detection (the `d_type` value).*
+
+*Write a man page, also using asciidoc.*
+
+*Make the private functions static.*
+

@@ -1,0 +1,3 @@
+`shtar` is an archive utility similar to `tar`.
+
+See link:https://nocloud-tech.github.io/shtar/index.html[the official documentation].
