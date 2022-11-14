@@ -21,8 +21,20 @@ rule link
 rule html
     command = asciidoctor --backend=html5 \$in
 
+rule configure
+    command = ./configure
+    deps = \$in
+
+build build.ninja: configure
 build shtar: link shtar.c
 build docs/index.html: html docs/index.adoc
+build docs/comparison.html: html docs/comparison.adoc
+build docs/install.html: html docs/install.adoc
+build docs/faq.html: html docs/faq.adoc
+build docs/man.html: html docs/man.adoc
+build docs/processes.html: html docs/processes.adoc
+build docs/backlog.html: html docs/backlog.adoc
 EOF
 } > "$dirname"/build.ninja
+
 

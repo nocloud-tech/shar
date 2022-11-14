@@ -1,0 +1,71 @@
+= shtar(1)
+Michael Ainsworth
+v0.1
+:doctype: manpage
+:man-linkstyle: pass:[blue R < >]
+
+== Name
+
+shtar - an archive utility similar to `tar`
+
+== Synopsis
+
+*shtar* [_OPTION_]... 
+
+== Options
+
+*-h, --help*::
+  Print a short help message.
+
+*-i, --input* FILE::
+  Use `FILE` as the input. Note that `FILE` can be a regular file, but it can
+  also be a directory (e.g., for recursion). If no input file is specified,
+  standard input is used and the resulting archive is not recursive.
+
+*-o, --output* FILE::
+  Use `FILE` as the output file name. If no output file is specified,
+  standard ouput is used.
+
+*-s, --shebang*::
+  Include a "shabang" at the beginning of the output. Note that if this option
+  is specified, the resulting output will include a `#!/bin/sh` (or similar)
+  line.
+
+*-S, --no-shebang*::
+  Do the *opposite* of the `--shebang` option.  That is, don't include the
+  `#!/bin/sh` line.
+
+*-p, --sh-path* PATH::
+  Indicate the path to the shell script interpreter. By default this is
+  `#!/bin/sh`, although other shells (like `dash` and `zsh` should also fine too.
+
+*-d, --destination* FILE::
+  Use `FILE` as the output path when extracting the archive. Note that this is
+  not the same as the `--output` option. That is, the `--output` option will
+  create a filesystem name _for the archive itself_ whereas the `--destination`
+  option will create a filesystem name _for the extracted file or directory_.
+  Note that for directories, the `--destination` option is only used for the
+  top-level directory.
+
+== Exit status
+
+*0*::
+  The archive was created successfully.
+
+*Non-0*::
+  An error occurred when creating the archive. An error message should appear
+  indicating the cause of this error.
+
+== Resources
+
+`shtar` git repository on GitHub::
+  https://github.com/nocloud-tech/shtar
+
+== Authors
+
+{author}
+
+== Copying
+
+Copyright \(C) 2022 {author} licenced under GPL-3.0-or-later. See "COPYING.txt"
+for details.

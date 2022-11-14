@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
 <meta name="author" content="Michael Ainsworth">
-<title>shtar</title>
+<title>Comparison</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -437,45 +437,166 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 </head>
-<body class="article">
+<body class="article toc2 toc-left">
 <div id="header">
-<h1>shtar</h1>
+<h1>Comparison</h1>
 <div class="details">
 <span id="author" class="author">Michael Ainsworth</span><br>
-<span id="revnumber">version 0.1</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_tar_archives">TAR Archives</a></li>
+<li><a href="#_shtar_archives">SHTAR Archives</a></li>
+</ul>
 </div>
 </div>
 <div id="content">
+<div id="preamble">
+<div class="sectionbody">
 <div class="paragraph">
-<p><code>shtar</code> is "the shell archiver", a utility similar to <code>tar</code>.</p>
+<p>The following document compares <code>tar</code> with <code>shtar</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tar_archives">TAR Archives</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The venerable <code>tar</code> ("tape archiver") utility creates an archive. An archive is
+a single file that acts as a container for one or more other files and directories.</p>
+</div>
+<div class="paragraph">
+<p>Imagine you keep your tasks in a series of text files in a <code>tasks</code> directory.</p>
+</div>
+<div class="listingblock">
+<div class="title">Show original tasks</div>
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">head tasks/{1,2}.txt</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Original tasks</div>
+<div class="content">
+<pre>==&gt; tasks/1.txt &lt;==
+Clean the kitchen.
+
+==&gt; tasks/2.txt &lt;==
+Go grocery shopping.
+
+- Bread
+- Milk
+- Pizza
+- Fruit
+- Pizza
+- Pizza</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can combine the <code>tasks</code> directory and all the text files it contains into a
+file called <code>tasks.tar</code> with the following command.</p>
+</div>
+<div class="listingblock">
+<div class="title">Creating the archive and listing the archive file details</div>
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">tar --create --file tasks.tar tasks
+ls -lh tasks.tar</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">The archive file details</div>
+<div class="content">
+<pre>-rw-rw-r-- 1 user user 10240 Nov 12 21:56 tasks.tar</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can then re-create these files and directories from the archive.</p>
+</div>
+<div class="listingblock">
+<div class="title">Extract the archive to a temporary directory and show the contents</div>
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">d=$(mktemp -d)
+cp tasks.tar "$d"
+cd "$d"
+tar --extract --file tasks.tar
+head -n 10 tasks/*</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">The extracted files are identical to the original files</div>
+<div class="content">
+<pre>==&gt; tasks/1.txt &lt;==
+Clean the kitchen.
+
+==&gt; tasks/2.txt &lt;==
+Go grocery shopping.
+
+- Bread
+- Milk
+- Pizza
+- Fruit
+- Pizza
+- Pizza</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>tar</code> is useful. It is well documented, broadly used, supports compression and
+a number of other features, and has a long history. It will likely be used for
+a long time to come. However, it has some disadvantages.</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="./comparison.html">Comparison with TAR</a></p>
+<p>Whilst it installed on most UNIX-like systems, it is not present on all of them.</p>
 </li>
 <li>
-<p><a href="./install.html">Installation</a></p>
+<p>Versions of it on different platforms might support different command line arguments.</p>
 </li>
 <li>
-<p><a href="./faq.html">FAQ</a></p>
-</li>
-<li>
-<p><a href="./man.html">Manual</a></p>
-</li>
-<li>
-<p><a href="./processes.html">Processes</a></p>
-</li>
-<li>
-<p><a href="./backlog.html">Backlog</a></p>
+<p>Versions of it may have different levels of support for the variations in file format.</p>
 </li>
 </ul>
 </div>
 </div>
+</div>
+<div class="sect1">
+<h2 id="_shtar_archives">SHTAR Archives</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><code>shtar</code> does not replace <code>tar</code> - not by a long shot. It does, however, serve a
+similar purpose, in that it creates a single archive file that contains other
+files and directories.</p>
+</div>
+<div class="paragraph">
+<p>However, <code>shtar</code> is different. Instead of creating an archive file that can be
+extracted using another invocation of <code>shtar</code>, it instead creates a
+POSIX-compatible shell script that, when executed, will <em>extract itself</em>.</p>
+</div>
+<div class="paragraph">
+<p>This has several benefits:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>POSIX-compatible shells are installed on the vast majority of UNIX-like
+systems.</p>
+</li>
+<li>
+<p>There is less variation in the POSIX shell primitives used by <code>shtar</code> to
+recreate file and directories.</p>
+</li>
+<li>
+<p>The file format can evolve over time, as long as <code>sh</code> can execute the
+commands. E.g., if we want to make the archive smaller, this can be done.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 <div id="footer">
 <div id="footer-text">
-Version 0.1<br>
-Last updated 2022-11-14 17:04:09 +1100
+Last updated 2022-11-14 16:16:59 +1100
 </div>
 </div>
 </body>

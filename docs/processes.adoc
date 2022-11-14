@@ -1,0 +1,8 @@
+= shtar
+Michael Ainsworth
+
+Each changes to `shtar` should:
+
+- Update the version number and date in `index.adoc`.
+- Update the version number and copyright year in  `man.adoc`.
+- Compile the software with `./configure` and `ninja`.

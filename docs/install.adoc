@@ -1,0 +1,27 @@
+= shtar
+Michael Ainsworth
+:toc: left
+
+Follow the instructions below to install `shtar`.
+
+== Installation Instructions
+
+Currently, `shtar` must be built from source.
+
+=== Building from Source
+
+Building `shtar` from source requires the following.
+
+- link:https://ninja-build.org/[Ninja Build]
+- link:https://asciidoc.org/[Asciidoc]
+
+Once installed, perform the following.
+
+.Configure and "make" (with ninja)
+[source,sh]
+----
+./configure
+ninja
+----
+
+Note that at present, there is no `make install` step.

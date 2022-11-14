@@ -1,0 +1,63 @@
+= shtar
+Michael Ainsworth
+:toc: left
+
+*What do the shell scripts look like?*
+
+Let's use the `tasks/1.txt` file from the link:./comparison.html[comparison] page.
+
+----
+Clean the kitchen.
+----
+
+You can create a restoration script using the following command:
+
+.Create a shtar archive
+[source,sh]
+----
+shtar < tasks/1.txt
+----
+
+The output (written to standard out by default) will be as follows.
+
+.The content of the shtar archive
+[source,sh]
+----
+(
+printf "\103"
+printf "\154"
+printf "\145"
+printf "\141"
+printf "\156"
+printf "\040"
+printf "\164"
+printf "\150"
+printf "\145"
+printf "\040"
+printf "\153"
+printf "\151"
+printf "\164"
+printf "\143"
+printf "\150"
+printf "\145"
+printf "\156"
+printf "\056"
+printf "\012"
+)
+----
+
+*Wouldn't the resulting archive be bigger than the original input?*
+
+Yes. Size and speed are not goals of the project. Rather, the goal is a high
+level of compatibility with as many systems as possible. And the one piece of
+software that is installed on most UNIX-like systems is a POSIX-compatible
+shell.
+
+*Why did you work on this project?*
+
+Teaser: `shtar` exists in order that it can be used by other programs that rely
+heavily on compatible shells.
+
+I created `shtar` as a helper for my configuration management software,
+link:https://github.com/nocloud-tech/hammer[Hammer].
+

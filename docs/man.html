@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.10">
 <meta name="author" content="Michael Ainsworth">
-<title>shtar</title>
+<title>shtar(1)</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -437,45 +437,125 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>shtar</h1>
-<div class="details">
-<span id="author" class="author">Michael Ainsworth</span><br>
-<span id="revnumber">version 0.1</span>
+<h1>shtar(1) Manual Page</h1>
+<h2 id="_name">Name</h2>
+<div class="sectionbody">
+<p>shtar - an archive utility similar to `tar`</p>
 </div>
 </div>
 <div id="content">
+<div class="sect1">
+<h2 id="_synopsis">Synopsis</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p><code>shtar</code> is "the shell archiver", a utility similar to <code>tar</code>.</p>
+<p><strong>shtar</strong> [<em>OPTION</em>]&#8230;&#8203;</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="./comparison.html">Comparison with TAR</a></p>
-</li>
-<li>
-<p><a href="./install.html">Installation</a></p>
-</li>
-<li>
-<p><a href="./faq.html">FAQ</a></p>
-</li>
-<li>
-<p><a href="./man.html">Manual</a></p>
-</li>
-<li>
-<p><a href="./processes.html">Processes</a></p>
-</li>
-<li>
-<p><a href="./backlog.html">Backlog</a></p>
-</li>
-</ul>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_options">Options</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>-h, --help</strong></dt>
+<dd>
+<p>Print a short help message.</p>
+</dd>
+<dt class="hdlist1"><strong>-i, --input</strong> FILE</dt>
+<dd>
+<p>Use <code>FILE</code> as the input. Note that <code>FILE</code> can be a regular file, but it can
+also be a directory (e.g., for recursion). If no input file is specified,
+standard input is used and the resulting archive is not recursive.</p>
+</dd>
+<dt class="hdlist1"><strong>-o, --output</strong> FILE</dt>
+<dd>
+<p>Use <code>FILE</code> as the output file name. If no output file is specified,
+standard ouput is used.</p>
+</dd>
+<dt class="hdlist1"><strong>-s, --shebang</strong></dt>
+<dd>
+<p>Include a "shabang" at the beginning of the output. Note that if this option
+is specified, the resulting output will include a <code>#!/bin/sh</code> (or similar)
+line.</p>
+</dd>
+<dt class="hdlist1"><strong>-S, --no-shebang</strong></dt>
+<dd>
+<p>Do the <strong>opposite</strong> of the <code>--shebang</code> option.  That is, don&#8217;t include the
+<code>#!/bin/sh</code> line.</p>
+</dd>
+<dt class="hdlist1"><strong>-p, --sh-path</strong> PATH</dt>
+<dd>
+<p>Indicate the path to the shell script interpreter. By default this is
+<code>#!/bin/sh</code>, although other shells (like <code>dash</code> and <code>zsh</code> should also fine too.</p>
+</dd>
+<dt class="hdlist1"><strong>-d, --destination</strong> FILE</dt>
+<dd>
+<p>Use <code>FILE</code> as the output path when extracting the archive. Note that this is
+not the same as the <code>--output</code> option. That is, the <code>--output</code> option will
+create a filesystem name <em>for the archive itself</em> whereas the <code>--destination</code>
+option will create a filesystem name <em>for the extracted file or directory</em>.
+Note that for directories, the <code>--destination</code> option is only used for the
+top-level directory.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_exit_status">Exit status</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><strong>0</strong></dt>
+<dd>
+<p>The archive was created successfully.</p>
+</dd>
+<dt class="hdlist1"><strong>Non-0</strong></dt>
+<dd>
+<p>An error occurred when creating the archive. An error message should appear
+indicating the cause of this error.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_resources">Resources</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>shtar</code> git repository on GitHub</dt>
+<dd>
+<p><a href="https://github.com/nocloud-tech/shtar" class="bare">https://github.com/nocloud-tech/shtar</a></p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_authors">Authors</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Michael Ainsworth</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_copying">Copying</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Copyright (C) 2022 Michael Ainsworth licenced under GPL-3.0-or-later. See "COPYING.txt"
+for details.</p>
+</div>
+</div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 0.1<br>
-Last updated 2022-11-14 17:04:09 +1100
+Last updated 2022-11-14 17:08:18 +1100
 </div>
 </div>
 </body>

@@ -442,40 +442,82 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h1>shtar</h1>
 <div class="details">
 <span id="author" class="author">Michael Ainsworth</span><br>
-<span id="revnumber">version 0.1</span>
 </div>
 </div>
 <div id="content">
 <div class="paragraph">
-<p><code>shtar</code> is "the shell archiver", a utility similar to <code>tar</code>.</p>
+<p><strong>What do the shell scripts look like?</strong></p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><a href="./comparison.html">Comparison with TAR</a></p>
-</li>
-<li>
-<p><a href="./install.html">Installation</a></p>
-</li>
-<li>
-<p><a href="./faq.html">FAQ</a></p>
-</li>
-<li>
-<p><a href="./man.html">Manual</a></p>
-</li>
-<li>
-<p><a href="./processes.html">Processes</a></p>
-</li>
-<li>
-<p><a href="./backlog.html">Backlog</a></p>
-</li>
-</ul>
+<div class="paragraph">
+<p>Let&#8217;s use the <code>tasks/1.txt</code> file from the <a href="./comparison.html">comparison</a> page.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Clean the kitchen.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can create a restoration script using the following command:</p>
+</div>
+<div class="listingblock">
+<div class="title">Create a shtar archive</div>
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">shtar &lt; tasks/1.txt</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output (written to standard out by default) will be as follows.</p>
+</div>
+<div class="listingblock">
+<div class="title">The content of the shtar archive</div>
+<div class="content">
+<pre class="highlight"><code class="language-sh" data-lang="sh">(
+printf "\103"
+printf "\154"
+printf "\145"
+printf "\141"
+printf "\156"
+printf "\040"
+printf "\164"
+printf "\150"
+printf "\145"
+printf "\040"
+printf "\153"
+printf "\151"
+printf "\164"
+printf "\143"
+printf "\150"
+printf "\145"
+printf "\156"
+printf "\056"
+printf "\012"
+)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Wouldn&#8217;t the resulting archive be bigger than the original input?</strong></p>
+</div>
+<div class="paragraph">
+<p>Yes. Size and speed are not goals of the project. Rather, the goal is a high
+level of compatibility with as many systems as possible. And the one piece of
+software that is installed on most UNIX-like systems is a POSIX-compatible
+shell.</p>
+</div>
+<div class="paragraph">
+<p><strong>Why did you work on this project?</strong></p>
+</div>
+<div class="paragraph">
+<p>Teaser: <code>shtar</code> exists in order that it can be used by other programs that rely
+heavily on compatible shells.</p>
+</div>
+<div class="paragraph">
+<p>I created <code>shtar</code> as a helper for my configuration management software,
+<a href="https://github.com/nocloud-tech/hammer">Hammer</a>.</p>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 0.1<br>
-Last updated 2022-11-14 17:04:09 +1100
+Last updated 2022-11-14 17:10:34 +1100
 </div>
 </div>
 </body>
