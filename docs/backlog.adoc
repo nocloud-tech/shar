@@ -11,8 +11,6 @@ The following is a list of items that should be completed.
 
 *Stop using `DIR*` for type detection (the `d_type` value).*
 
-*Write a man page, also using asciidoc.*
-
 *Finish the `-h` command.*
 
 *Make the private functions static.*

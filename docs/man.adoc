@@ -17,55 +17,50 @@ shtar - an archive utility similar to `tar`
 *-h, --help*::
   Print a short help message.
 
-*-i, --input* FILE::
-  Use `FILE` as the input. Note that `FILE` can be a regular file, but it can
-  also be a directory (e.g., for recursion). If no input file is specified,
-  standard input is used and the resulting archive is not recursive.
+*-i, --input* _FILE_::
+  Use _FILE_ as the input. Note that _FILE_ can be a regular file, but it can
+  also be a directory (e.g., for recursion). If _FILE_ is not specified,
+  standard input is used and the resulting archive is not recursive - that is,
+  it only contains a single file, not a directory with nested files and directories.
 
-*-o, --output* FILE::
-  Use `FILE` as the output file name. If no output file is specified,
+*-o, --output* _FILE_::
+  Use _FILE_ as the output file name. If no output file is specified,
   standard ouput is used.
 
 *-s, --shebang*::
-  Include a "shabang" at the beginning of the output. Note that if this option
-  is specified, the resulting output will include a `#!/bin/sh` (or similar)
-  line.
+  Include a "shebang" at the beginning of the output. Note that if this option
+  is specified, the resulting output will include a _#!/bin/sh_ (or similar)
+  line. See the _--sh-path_ option.
 
 *-S, --no-shebang*::
-  Do the *opposite* of the `--shebang` option.  That is, don't include the
-  `#!/bin/sh` line.
+  Do the _opposite_ of the _--shebang_ option.  That is, don't include the
+  _#!/bin/sh_ line.
 
-*-p, --sh-path* PATH::
+*-p, --sh-path* _PATH_::
   Indicate the path to the shell script interpreter. By default this is
-  `#!/bin/sh`, although other shells (like `dash` and `zsh` should also fine too.
+  _#!/bin/sh_, although paths to other shells (like _#!/bin/dash_ and
+  _#!/usr/local/bin/zsh_) should also fine too.
 
-*-d, --destination* FILE::
-  Use `FILE` as the output path when extracting the archive. Note that this is
-  not the same as the `--output` option. That is, the `--output` option will
-  create a filesystem name _for the archive itself_ whereas the `--destination`
+*-d, --destination* _FILE_::
+  Use _FILE_ as the output path when extracting the archive. Note that this is
+  not the same as the _--output_ option. That is, the _--output_ option will
+  create a filesystem name _for the archive itself_ whereas the _--destination_
   option will create a filesystem name _for the extracted file or directory_.
-  Note that for directories, the `--destination` option is only used for the
+  Note that for directories, the _--destination_ option is only used for the
   top-level directory.
 
 == Exit status
 
-*0*::
-  The archive was created successfully.
-
-*Non-0*::
-  An error occurred when creating the archive. An error message should appear
-  indicating the cause of this error.
+`shtar` will exit with `0` on success and non `0` on failure. An error message
+should appear indicating the cause of this error.
 
 == Resources
 
 `shtar` git repository on GitHub::
   https://github.com/nocloud-tech/shtar
 
-== Authors
-
-{author}
-
 == Copying
 
-Copyright \(C) 2022 {author} licenced under GPL-3.0-or-later. See "COPYING.txt"
-for details.
+Copyright \(C) 2022 {author}.
+Licensed under GPL-3.0-or-later.
+See <https://www.gnu.org/licenses/>. 

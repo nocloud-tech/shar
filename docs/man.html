@@ -463,40 +463,42 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <dd>
 <p>Print a short help message.</p>
 </dd>
-<dt class="hdlist1"><strong>-i, --input</strong> FILE</dt>
+<dt class="hdlist1"><strong>-i, --input</strong> <em>FILE</em></dt>
 <dd>
-<p>Use <code>FILE</code> as the input. Note that <code>FILE</code> can be a regular file, but it can
-also be a directory (e.g., for recursion). If no input file is specified,
-standard input is used and the resulting archive is not recursive.</p>
+<p>Use <em>FILE</em> as the input. Note that <em>FILE</em> can be a regular file, but it can
+also be a directory (e.g., for recursion). If <em>FILE</em> is not specified,
+standard input is used and the resulting archive is not recursive - that is,
+it only contains a single file, not a directory with nested files and directories.</p>
 </dd>
-<dt class="hdlist1"><strong>-o, --output</strong> FILE</dt>
+<dt class="hdlist1"><strong>-o, --output</strong> <em>FILE</em></dt>
 <dd>
-<p>Use <code>FILE</code> as the output file name. If no output file is specified,
+<p>Use <em>FILE</em> as the output file name. If no output file is specified,
 standard ouput is used.</p>
 </dd>
 <dt class="hdlist1"><strong>-s, --shebang</strong></dt>
 <dd>
-<p>Include a "shabang" at the beginning of the output. Note that if this option
-is specified, the resulting output will include a <code>#!/bin/sh</code> (or similar)
-line.</p>
+<p>Include a "shebang" at the beginning of the output. Note that if this option
+is specified, the resulting output will include a <em>#!/bin/sh</em> (or similar)
+line. See the <em>--sh-path</em> option.</p>
 </dd>
 <dt class="hdlist1"><strong>-S, --no-shebang</strong></dt>
 <dd>
-<p>Do the <strong>opposite</strong> of the <code>--shebang</code> option.  That is, don&#8217;t include the
-<code>#!/bin/sh</code> line.</p>
+<p>Do the <em>opposite</em> of the <em>--shebang</em> option.  That is, don&#8217;t include the
+<em>#!/bin/sh</em> line.</p>
 </dd>
-<dt class="hdlist1"><strong>-p, --sh-path</strong> PATH</dt>
+<dt class="hdlist1"><strong>-p, --sh-path</strong> <em>PATH</em></dt>
 <dd>
 <p>Indicate the path to the shell script interpreter. By default this is
-<code>#!/bin/sh</code>, although other shells (like <code>dash</code> and <code>zsh</code> should also fine too.</p>
+<em><mark>!/bin/sh</em>, although paths to other shells (like <em></mark>!/bin/dash</em> and
+<em>#!/usr/local/bin/zsh</em>) should also fine too.</p>
 </dd>
-<dt class="hdlist1"><strong>-d, --destination</strong> FILE</dt>
+<dt class="hdlist1"><strong>-d, --destination</strong> <em>FILE</em></dt>
 <dd>
-<p>Use <code>FILE</code> as the output path when extracting the archive. Note that this is
-not the same as the <code>--output</code> option. That is, the <code>--output</code> option will
-create a filesystem name <em>for the archive itself</em> whereas the <code>--destination</code>
+<p>Use <em>FILE</em> as the output path when extracting the archive. Note that this is
+not the same as the <em>--output</em> option. That is, the <em>--output</em> option will
+create a filesystem name <em>for the archive itself</em> whereas the <em>--destination</em>
 option will create a filesystem name <em>for the extracted file or directory</em>.
-Note that for directories, the <code>--destination</code> option is only used for the
+Note that for directories, the <em>--destination</em> option is only used for the
 top-level directory.</p>
 </dd>
 </dl>
@@ -506,18 +508,9 @@ top-level directory.</p>
 <div class="sect1">
 <h2 id="_exit_status">Exit status</h2>
 <div class="sectionbody">
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><strong>0</strong></dt>
-<dd>
-<p>The archive was created successfully.</p>
-</dd>
-<dt class="hdlist1"><strong>Non-0</strong></dt>
-<dd>
-<p>An error occurred when creating the archive. An error message should appear
-indicating the cause of this error.</p>
-</dd>
-</dl>
+<div class="paragraph">
+<p><code>shtar</code> will exit with <code>0</code> on success and non <code>0</code> on failure. An error message
+should appear indicating the cause of this error.</p>
 </div>
 </div>
 </div>
@@ -535,19 +528,12 @@ indicating the cause of this error.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_authors">Authors</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Michael Ainsworth</p>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="_copying">Copying</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Copyright (C) 2022 Michael Ainsworth licenced under GPL-3.0-or-later. See "COPYING.txt"
-for details.</p>
+<p>Copyright (C) 2022 Michael Ainsworth.
+Licensed under GPL-3.0-or-later.
+See <a href="https://www.gnu.org/licenses/" class="bare">https://www.gnu.org/licenses/</a>.</p>
 </div>
 </div>
 </div>
@@ -555,7 +541,7 @@ for details.</p>
 <div id="footer">
 <div id="footer-text">
 Version 0.1<br>
-Last updated 2022-11-14 17:08:18 +1100
+Last updated 2022-11-14 17:29:55 +1100
 </div>
 </div>
 </body>
