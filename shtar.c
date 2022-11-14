@@ -274,6 +274,7 @@ cleanup:
 shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name)
 {
     shtar_result_t r = SHTAR_ERROR;
+    struct stat sbuf;
     int c;
 
     assert(in);
@@ -303,6 +304,15 @@ shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, 
         if (quote(out, dst_name)) ecleanup(ioe);
     }
     if (0 > fprintf(out, "\n")) ecleanup(ioe);
+    if (in != stdin && dst_name)
+    {
+        if (fstat(fileno(in), &sbuf)) ecleanup(ioe);
+        if (0 > fprintf(out, "chmod ")) ecleanup(ioe);
+        /* TODO: Permission here. */
+        if (0 > fprintf(out, "%lo ", (unsigned long)(sbuf.st_mode & ~S_IFMT))) ecleanup(ioe);
+        if (quote(out, dst_name)) ecleanup(ioe);
+        if (0 > fprintf(out, "\n")) ecleanup(ioe);
+    }
 
     r = SHTAR_OK;
 
