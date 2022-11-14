@@ -27,6 +27,7 @@ shtar. If not, see <https://www.gnu.org/licenses/>.
 #include <dirent.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 typedef int shtar_result_t;
 
@@ -48,7 +49,7 @@ shtar_result_t quote(FILE *out, char *dst_name);
 static char *shtar_basename(char *path);
 shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path);
 shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name);
-shtar_result_t encode_directory(DIR *in, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name);
+shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name);
 
 int main(int argc, char **argv)
 {
@@ -62,6 +63,7 @@ shtar_result_t run(int argc, char **argv)
     char *out_name = NULL;
     FILE *in = NULL;
     DIR *in_dir = NULL;
+    int in_dirfd = -1;
     FILE *out = NULL;
     int use_shebang = 0;
     char *sh_path = NULL;
@@ -165,7 +167,10 @@ shtar_result_t run(int argc, char **argv)
     if (in_dir)
     {
         dst_name = dst_name ? dst_name : shtar_basename(in_name);
-        if (encode_directory(in_dir, out, use_shebang, sh_path, in_name, dst_name))
+        in_dirfd = open(in_name, O_DIRECTORY);
+        if (-1 == in_dirfd)
+            ecleanup("Unable to open directory with file descriptor.");
+        if (encode_directory(in_dir, in_dirfd, out, use_shebang, sh_path, in_name, dst_name))
             goto cleanup;
     }
     else
@@ -194,6 +199,12 @@ cleanup:
     {
         closedir(in_dir);
         in_dir = NULL;
+    }
+
+    if (-1 != in_dirfd)
+    {
+        close(in_dirfd);
+        in_dirfd = -1;
     }
 
     if (in && in != stdin)
@@ -319,11 +330,13 @@ cleanup:
     return r;
 }
 
-shtar_result_t encode_directory(DIR *in, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name)
+shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name)
 {
     shtar_result_t r = SHTAR_ERROR;
     struct dirent *entry = NULL;
     DIR *subdir = NULL;
+    int subdir_fd = -1;
+    struct stat sbuf;
     FILE *subfile = NULL;
     int dir_changed = 0;
 
@@ -352,8 +365,17 @@ shtar_result_t encode_directory(DIR *in, FILE *out, int use_shebang, char *sh_pa
         if (!strcmp(entry->d_name, ".")) continue;
         if (!strcmp(entry->d_name, "..")) continue;
 
-        if (DT_DIR == entry->d_type)
+        if (fstatat(dirfd, entry->d_name, &sbuf, 0))
+            ecleanup("Unable to stat subdirectory.");
+
+        if (S_IFDIR == (sbuf.st_mode & S_IFMT))
         {
+            if (-1 != subdir_fd)
+            {
+                close(subdir_fd);
+                subdir_fd = -1;
+            }
+
             if (subdir)
             {
                 closedir(subdir);
@@ -362,9 +384,14 @@ shtar_result_t encode_directory(DIR *in, FILE *out, int use_shebang, char *sh_pa
 
             subdir = opendir(entry->d_name);
             if (!subdir) ecleanup("Unable to open subdirectory.");
-            if (encode_directory(subdir, out, 0, "", entry->d_name, entry->d_name)) goto cleanup;
+
+            subdir_fd = openat(dirfd, entry->d_name, O_DIRECTORY);
+            if (-1 == subdir_fd)
+                ecleanup("Unable to open subdirectory with file descriptor.");
+
+            if (encode_directory(subdir, subdir_fd, out, 0, "", entry->d_name, entry->d_name)) goto cleanup;
         }
-        else if (DT_LNK == entry->d_type || DT_REG == entry->d_type)
+        else if (S_IFREG == (sbuf.st_mode & S_IFMT) || S_IFLNK == (sbuf.st_mode & S_IFMT))
         {
             if (subfile)
             {
@@ -391,6 +418,12 @@ cleanup:
     {
         fclose(subfile);
         subfile = NULL;
+    }
+
+    if (-1 != subdir_fd)
+    {
+        close(subdir_fd);
+        subdir_fd = -1;
     }
 
     if (subdir)

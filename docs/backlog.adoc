@@ -3,8 +3,6 @@ Michael Ainsworth
 
 The following is a list of items that should be completed.
 
-*Stop using `DIR*` for type detection (the `d_type` value).*
-
 *Ensure created directories have the same r/w/x permissions as the original.*
 
 *Make the private functions static.*
