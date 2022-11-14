@@ -49,7 +49,7 @@ static shtar_result_t quote(FILE *out, char *dst_name);
 static char *shtar_basename(char *path);
 static shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path);
 static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name);
-static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name);
+static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name, int depth);
 
 int main(int argc, char **argv)
 {
@@ -170,7 +170,8 @@ static shtar_result_t run(int argc, char **argv)
         in_dirfd = open(in_name, O_DIRECTORY);
         if (-1 == in_dirfd)
             ecleanup("Unable to open directory with file descriptor.");
-        if (encode_directory(in_dir, in_dirfd, out, use_shebang, sh_path, in_name, dst_name))
+        if (encode_directory(in_dir, in_dirfd, out, use_shebang, sh_path,
+                    in_name, dst_name, 0))
             goto cleanup;
     }
     else
@@ -330,7 +331,7 @@ cleanup:
     return r;
 }
 
-static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name)
+static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name, int depth)
 {
     shtar_result_t r = SHTAR_ERROR;
     struct dirent *entry = NULL;
@@ -395,7 +396,8 @@ static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_sh
             if (-1 == subdir_fd)
                 ecleanup("Unable to open subdirectory with file descriptor.");
 
-            if (encode_directory(subdir, subdir_fd, out, 0, "", entry->d_name, entry->d_name)) goto cleanup;
+            if (encode_directory(subdir, subdir_fd, out, 0, "", entry->d_name,
+                        entry->d_name, depth + 1)) goto cleanup;
         }
         else if (S_IFREG == (sbuf.st_mode & S_IFMT) || S_IFLNK == (sbuf.st_mode & S_IFMT))
         {
@@ -415,7 +417,10 @@ static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_sh
         }
     }
 
-    if (0 > fprintf(out, "cd ..\n")) ecleanup(ioe);
+    if (depth > 0)
+    {
+        if (0 > fprintf(out, "cd ..\n")) ecleanup(ioe);
+    }
 
     r = SHTAR_OK;
 
