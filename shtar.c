@@ -288,6 +288,7 @@ static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh
     shtar_result_t r = SHTAR_ERROR;
     struct stat sbuf;
     int c;
+    unsigned bytes_read = 0;
 
     assert(in);
     assert(out);
@@ -306,7 +307,13 @@ static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh
             break;
         }
 
+        bytes_read += 1;
         if (0 > fprintf(out, "printf \"\\%03o\"\n", (unsigned int)c)) ecleanup(ioe);
+    }
+
+    if (!bytes_read)
+    {
+        if (0 > fprintf(out, "echo -n\n")) ecleanup(ioe);
     }
 
     if (0 > fprintf(out, ")")) ecleanup(ioe);
