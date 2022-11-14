@@ -350,6 +350,12 @@ shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, 
     if (quote(out, dst_name)) ecleanup(ioe);
     if (0 > fprintf(out, "\n")) ecleanup(ioe);
 
+    if (fstat(dirfd, &sbuf)) ecleanup(ioe);
+    if (0 > fprintf(out, "chmod ")) ecleanup(ioe);
+    if (0 > fprintf(out, "%lo ", (unsigned long)(sbuf.st_mode & ~S_IFMT))) ecleanup(ioe);
+    if (quote(out, dst_name)) ecleanup(ioe);
+    if (0 > fprintf(out, "\n")) ecleanup(ioe);
+
     if (0 > fprintf(out, "cd ")) ecleanup(ioe);
     if (quote(out, dst_name)) ecleanup(ioe);
     if (0 > fprintf(out, "\n")) ecleanup(ioe);
