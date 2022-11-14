@@ -3,8 +3,6 @@ Michael Ainsworth
 
 The following is a list of items that should be completed.
 
-*Make the private functions static.*
-
 *Installation scripts on various platforms.*
 
 E.g., snap initially, then others.

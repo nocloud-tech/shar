@@ -44,19 +44,19 @@ do                                \
 static char *ioe = "Error writing file.";
 static char *default_sh_path = "/bin/sh";
 
-shtar_result_t run(int argc, char **argv);
-shtar_result_t quote(FILE *out, char *dst_name);
+static shtar_result_t run(int argc, char **argv);
+static shtar_result_t quote(FILE *out, char *dst_name);
 static char *shtar_basename(char *path);
-shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path);
-shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name);
-shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name);
+static shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path);
+static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name);
+static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name);
 
 int main(int argc, char **argv)
 {
     return !run(argc - 1, argv + 1) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-shtar_result_t run(int argc, char **argv)
+static shtar_result_t run(int argc, char **argv)
 {
     shtar_result_t r = SHTAR_ERROR;
     char *in_name = NULL;
@@ -230,7 +230,7 @@ static char *shtar_basename(char *path)
     return r;
 }
 
-shtar_result_t quote(FILE *out, char *dst_name)
+static shtar_result_t quote(FILE *out, char *dst_name)
 {
     shtar_result_t r = SHTAR_ERROR;
     size_t i, len;
@@ -263,7 +263,7 @@ cleanup:
     return r;
 }
 
-shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path)
+static shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path)
 {
     shtar_result_t r = SHTAR_ERROR;
 
@@ -282,7 +282,7 @@ cleanup:
 
 }
 
-shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name)
+static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name)
 {
     shtar_result_t r = SHTAR_ERROR;
     struct stat sbuf;
@@ -330,7 +330,7 @@ cleanup:
     return r;
 }
 
-shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name)
+static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name)
 {
     shtar_result_t r = SHTAR_ERROR;
     struct dirent *entry = NULL;
