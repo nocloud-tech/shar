@@ -47,6 +47,7 @@ static char *default_sh_path = "/bin/sh";
 static shtar_result_t run(int argc, char **argv);
 static shtar_result_t quote(FILE *out, char *dst_name);
 static char *shtar_basename(char *path);
+static shtar_result_t shtar_dirname(char *path, char **dirname);
 static shtar_result_t encode_common(FILE *out, int use_shebang, char *sh_path, int depth);
 static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name, int depth);
 static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name, int depth);
@@ -230,6 +231,38 @@ static char *shtar_basename(char *path)
     return r;
 }
 
+static shtar_result_t shtar_dirname(char *path, char **dirname)
+{
+    shtar_result_t r = SHTAR_ERROR;
+    char *l = NULL;
+    size_t size = 0;
+
+    assert(dirname);
+    assert(!*dirname);
+    assert(path);
+    l = rindex(path, '/');
+    if (!l)
+    {
+        size = 3;
+        *dirname = malloc(size);
+        if (!*dirname) goto cleanup;
+        memcpy((*dirname), "./", 2);
+    }
+    else
+    {
+        size = l - path + 2;
+        *dirname = malloc(size);
+        if (!*dirname) goto cleanup;
+        memcpy((*dirname), path, l - path);
+        (*dirname)[size-2] = 0;
+    }
+
+    r = SHTAR_OK;
+
+cleanup:
+    return r;
+}
+
 static shtar_result_t quote(FILE *out, char *dst_name)
 {
     shtar_result_t r = SHTAR_ERROR;
@@ -297,6 +330,7 @@ static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh
     struct stat sbuf;
     int c;
     char fn;
+    char *dirname = NULL;
 
     assert(in);
     assert(out);
@@ -306,6 +340,15 @@ static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh
 
     if (dst_name)
     {
+        if (rindex(dst_name, '/'))
+        {
+            if (shtar_dirname(dst_name, &dirname)) goto cleanup;
+
+            if (0 > fprintf(out, "mkdir -p ")) ecleanup(ioe);
+            if (quote(out, dirname)) ecleanup(ioe);
+            if (0 > fprintf(out, "\n")) ecleanup(ioe);
+        }
+
         if (0 > fprintf(out, "exec 9> ")) ecleanup(ioe);
         if (quote(out, dst_name)) ecleanup(ioe);
         if (0 > fprintf(out, "\n")) ecleanup(ioe);
@@ -345,6 +388,11 @@ static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh
     r = SHTAR_OK;
 
 cleanup:
+    if (dirname)
+    {
+        free(dirname);
+    }
+
     return r;
 }
 
@@ -364,7 +412,7 @@ static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_sh
 
     if (encode_common(out, use_shebang, sh_path, depth)) goto cleanup;
 
-    if (0 > fprintf(out, "mkdir ")) ecleanup(ioe);
+    if (0 > fprintf(out, "mkdir -p ")) ecleanup(ioe);
     if (quote(out, dst_name)) ecleanup(ioe);
     if (0 > fprintf(out, "\n")) ecleanup(ioe);
 
