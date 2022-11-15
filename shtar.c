@@ -47,8 +47,8 @@ static char *default_sh_path = "/bin/sh";
 static shtar_result_t run(int argc, char **argv);
 static shtar_result_t quote(FILE *out, char *dst_name);
 static char *shtar_basename(char *path);
-static shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path);
-static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name);
+static shtar_result_t encode_common(FILE *out, int use_shebang, char *sh_path, int depth);
+static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name, int depth);
 static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_shebang, char *sh_path, char *dirname, char *dst_name, int depth);
 
 int main(int argc, char **argv)
@@ -175,7 +175,7 @@ static shtar_result_t run(int argc, char **argv)
     }
     else
     {
-        if (encode_file(in, out, use_shebang, sh_path, dst_name)) goto cleanup;
+        if (encode_file(in, out, use_shebang, sh_path, dst_name, 0)) goto cleanup;
     }
 
     if (out && out != stdout)
@@ -263,7 +263,7 @@ cleanup:
     return r;
 }
 
-static shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path)
+static shtar_result_t encode_common(FILE *out, int use_shebang, char *sh_path, int depth)
 {
     shtar_result_t r = SHTAR_ERROR;
 
@@ -275,6 +275,12 @@ static shtar_result_t encode_shebang(FILE *out, int use_shebang, char *sh_path)
         if (0 > fprintf(out, "#!%s\n", sh_path)) ecleanup(ioe);
     }
 
+    if (!depth)
+    {
+        if (0 > fprintf(out, "f() { printf \"$1\" 1>&9; }\n")) ecleanup(ioe);
+        if (0 > fprintf(out, "o() { printf \"$1\" ; }\n")) ecleanup(ioe);
+    }
+
     r = SHTAR_OK;
 
 cleanup:
@@ -282,20 +288,30 @@ cleanup:
 
 }
 
-static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name)
+static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh_path, char *dst_name, int depth)
 {
     shtar_result_t r = SHTAR_ERROR;
     struct stat sbuf;
     int c;
-    unsigned bytes_read = 0;
+    char fn;
 
     assert(in);
     assert(out);
     assert(sh_path);
 
-    if (encode_shebang(out, use_shebang, sh_path)) goto cleanup;
+    if (encode_common(out, use_shebang, sh_path, depth)) goto cleanup;
 
-    if (0 > fprintf(out, "(\n")) ecleanup(ioe);
+    if (dst_name)
+    {
+        if (0 > fprintf(out, "exec 9> ")) ecleanup(ioe);
+        if (quote(out, dst_name)) ecleanup(ioe);
+        if (0 > fprintf(out, "\n")) ecleanup(ioe);
+        fn = 'f';
+    }
+    else
+    {
+        fn = 'o';
+    }
 
     while (1)
     {
@@ -306,22 +322,14 @@ static shtar_result_t encode_file(FILE *in, FILE *out, int use_shebang, char *sh
             break;
         }
 
-        bytes_read += 1;
-        if (0 > fprintf(out, "printf \"\\%03o\"\n", (unsigned int)c)) ecleanup(ioe);
+        if (0 > fprintf(out, "%c \"\\%03o\"\n", fn, (unsigned int)c)) ecleanup(ioe);
     }
 
-    if (!bytes_read)
-    {
-        if (0 > fprintf(out, "echo -n\n")) ecleanup(ioe);
-    }
-
-    if (0 > fprintf(out, ")")) ecleanup(ioe);
     if (dst_name)
     {
-        if (0 > fprintf(out, " > ")) ecleanup(ioe);
-        if (quote(out, dst_name)) ecleanup(ioe);
+        if (0 > fprintf(out, "exec 9>&-\n")) ecleanup(ioe);
     }
-    if (0 > fprintf(out, "\n")) ecleanup(ioe);
+
     if (in != stdin && dst_name)
     {
         if (fstat(fileno(in), &sbuf)) ecleanup(ioe);
@@ -351,7 +359,7 @@ static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_sh
     assert(out);
     assert(sh_path);
 
-    if (encode_shebang(out, use_shebang, sh_path)) goto cleanup;
+    if (encode_common(out, use_shebang, sh_path, depth)) goto cleanup;
 
     if (0 > fprintf(out, "mkdir ")) ecleanup(ioe);
     if (quote(out, dst_name)) ecleanup(ioe);
@@ -415,7 +423,7 @@ static shtar_result_t encode_directory(DIR *in, int dirfd, FILE *out, int use_sh
 
             subfile = fopen(entry->d_name, "rb");
             if (!subfile) ecleanup("Unable to open subfile.");
-            if (encode_file(subfile, out, 0, "", entry->d_name)) goto cleanup;
+            if (encode_file(subfile, out, 0, "", entry->d_name, depth + 1)) goto cleanup;
         }
         else
         {
