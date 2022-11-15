@@ -74,8 +74,7 @@ static shtar_result_t run(int argc, char **argv)
     {
         if (!i && (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")))
         {
-            system("man 1 shtar");
-            r = SHTAR_OK;
+            r = system("man 1 shtar");
             goto cleanup;
         }
         else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--input"))
