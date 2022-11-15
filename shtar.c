@@ -277,6 +277,9 @@ static shtar_result_t encode_common(FILE *out, int use_shebang, char *sh_path, i
 
     if (!depth)
     {
+        if (0 > fprintf(out, "set -o errexit\n")) ecleanup(ioe);
+        if (0 > fprintf(out, "set -o nounset\n")) ecleanup(ioe);
+
         if (0 > fprintf(out, "f() { printf \"$1\" 1>&9; }\n")) ecleanup(ioe);
         if (0 > fprintf(out, "o() { printf \"$1\" ; }\n")) ecleanup(ioe);
     }
